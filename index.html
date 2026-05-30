@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aptitude Minimal Timer</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon/icon-192.png">
+  <meta name="theme-color" content="#1e3a8a">
+  <style>
+    :root {
+      --body-bg: linear-gradient(to bottom, #a1c4fd 0%, #c2e9fb 100%);
+      --glass-bg: rgba(255, 255, 255, 0.45);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --glass-shadow: rgba(0, 0, 0, 0.1);
+      --text-color: #334155;
+      --track-bg: rgba(255, 255, 255, 0.6);
+      --btn-bg: rgba(255, 255, 255, 0.4);
+      --btn-text-color: #1e293b;
+      --btn-hover-bg: rgba(255, 255, 255, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--body-bg);
+      color: var(--text-color);
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .glass-container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--glass-border);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 40px 0 var(--glass-shadow);
+      border-radius: 30px;
+      padding: 50px;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      transition: transform 0.3s ease;
+      background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.05) 100%);
+    }
+
+    .title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      color: #1e3a8a;
+      text-shadow: 0 1px 4px rgba(255, 255, 255, 0.5);
+    }
+
+    .status-text {
+      font-size: 1.15rem;
+      font-weight: 400;
+      min-height: 68px;
+      margin-bottom: 35px;
+      line-height: 1.7;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+    }
+
+    /* キャンバスを包むコンテナ */
+    .timer-visual {
+      position: relative;
+      width: 100%;
+      height: 95px;
+      margin: 35px 0;
+      border-radius: 20px;
+      background: var(--track-bg);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    /* キャンバス要素の設定 */
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    button {
+      background: var(--btn-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--btn-text-color);
+      padding: 16px 10px;
+      border-radius: 15px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    button:hover {
+      background: var(--btn-hover-bg);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .reset-btn {
+      background: rgba(255, 150, 150, 0.2);
+      border-color: rgba(255, 150, 150, 0.4);
+      color: #b91c1c;
+    }
+    .reset-btn:hover {
+      background: rgba(255, 150, 150, 0.4);
+    }
+
+    .done-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.5);
+      color: #1e3a8a;
+      font-weight: 700;
+      font-size: 1.25rem;
+      padding: 20px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 3px rgba(255, 255, 255, 0.7);
+    }
+
+    .done-btn:hover {
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 600px) {
+      .glass-container {
+        padding: 40px;
+      }
+      .btn-group {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .reset-btn {
+        grid-column: span 3;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glass-container">
+    <h1 class="title">Focus Timer</h1>
+    <div class="status-text" id="statusText">時間を選択してスタート</div>
+
+    <div class="timer-visual" id="canvasContainer">
+      <canvas id="timerCanvas"></canvas>
+    </div>
+
+    <div class="btn-group">
+      <button onclick="startTimer(30)">30秒</button>
+      <button onclick="startTimer(45)">45秒</button>
+      <button onclick="startTimer(60)">60秒</button>
+      <button onclick="startTimer(90)">90秒</button>
+      <button class="reset-btn" onclick="resetTimer()">リセット</button>
+    </div>
+
+    <button class="done-btn" onclick="stopTimer()">完了 / タイム記録</button>
+  </div>
+
+  <script>
+    // --- Canvas設定と初期化 ---
+    const canvas = document.getElementById('timerCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('canvasContainer');
+    let canvasWidth, canvasHeight;
+
+    // Retinaディスプレイ等でぼやけないようDPIスケーリングを行う関数
+    function resizeCanvas() {
+      const rect = container.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvasWidth = rect.width;
+      canvasHeight = rect.height;
+      
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      
+      drawCanvas(); // リサイズ時に再描画
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // --- スリープ抑止 (Wake Lock API) ---
+    let wakeLock = null;
+
+    async function requestWakeLock() {
+      if ('wakeLock' in navigator) {
+        try {
+          wakeLock = await navigator.wakeLock.request('screen');
+        } catch (err) {
+          console.warn(`Wake Lock error: ${err.name}, ${err.message}`);
+        }
+      }
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock !== null) {
+        wakeLock.release().then(() => {
+          wakeLock = null;
+        });
+      }
+    }
+
+    // 別タブを開いて戻ってきた時など、可視状態が変わったときの処理
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && isRunning) {
+        // 計測中で画面が再び表示されたら再ロック
+        requestWakeLock();
+      }
+    });
+
+    // --- タイマーのロジック用変数 ---
+    const PIXELS_PER_SEC = 15;
+    let animationFrameId;
+    let startTime = 0;
+    let targetSeconds = 0;
+    let isRunning = false;
+    let elapsedMs = 0; // 現在の経過時間
+
+    const statusText = document.getElementById('statusText');
+    
+    // 飛行機のSVGパスデータ（Path2Dオブジェクト）
+    const planePath = new Path2D('M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z');
+
+    // --- 描画関数 ---
+    function drawCanvas() {
+      // キャンバスをクリア
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      const centerX = canvasWidth / 2;
+      const centerY = canvasHeight / 2;
+      const currentX = (elapsedMs / 1000) * PIXELS_PER_SEC;
+
+      // 1. トラック（線とグリッド）の描画
+      if (targetSeconds > 0) {
+        ctx.save();
+        // 原点を現在のスクロール位置に合わせて移動
+        ctx.translate(centerX - currentX, centerY);
+
+        // 横線の描画
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(targetSeconds * PIXELS_PER_SEC, 0);
+        ctx.strokeStyle = 'rgba(0, 100, 200, 0.25)';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // 15秒ごとのグリッド線の描画
+        for (let s = 0; s <= targetSeconds; s += 15) {
+          const x = s * PIXELS_PER_SEC;
+          ctx.beginPath();
+          ctx.moveTo(x, -20);
+          ctx.lineTo(x, 20);
+          ctx.strokeStyle = 'rgba(0, 100, 200, 0.15)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // 2. 波紋エフェクトの描画（計測中のみ）
+      if (isRunning) {
+        // 2500ms周期の波紋
+        const pulseTime = (performance.now() - startTime) % 2500;
+        const pulseProgress = pulseTime / 2500;
+        const maxRadius = 35;
+        const currentRadius = maxRadius * pulseProgress;
+        const opacity = 1 - Math.pow(pulseProgress, 1.5); // だんだん薄くなる
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, currentRadius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(37, 99, 235, ${opacity * 0.5})`;
+        ctx.fill();
+      }
+
+      // 3. 飛行機の描画
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(Math.PI / 2); // 右向きに回転
+
+      // 光彩エフェクト
+      ctx.shadowColor = 'rgba(37, 99, 235, 0.6)';
+      ctx.shadowBlur = 15;
+      
+      // SVGパスを中心(12, 12)に合わせてスケーリング
+      const scale = 1.3; // 32px相当にするための倍率
+      ctx.scale(scale, scale);
+      ctx.translate(-12, -12); // 24x24のパスを中心へ
+      
+      ctx.fillStyle = '#2563eb';
+      ctx.fill(planePath);
+      ctx.restore();
+    }
+
+    // --- タイマー操作関数 ---
+    function startTimer(seconds) {
+      resetTimerState();
+      
+      targetSeconds = seconds;
+      isRunning = true;
+      startTime = performance.now();
+      elapsedMs = 0;
+
+      statusText.textContent = '測定中...';
+
+      // スリープを抑止する
+      requestWakeLock();
+
+      // 描画ループ開始
+      animationFrameId = requestAnimationFrame(updateTimer);
+    }
+
+    function updateTimer(currentTime) {
+      if (!isRunning) return;
+
+      elapsedMs = currentTime - startTime;
+      drawCanvas(); // 毎フレームキャンバスを描画し直す
+
+      animationFrameId = requestAnimationFrame(updateTimer);
+    }
+
+    function stopTimer() {
+      if (!isRunning) return;
+      
+      isRunning = false;
+      cancelAnimationFrame(animationFrameId);
+      
+      // スリープ抑止を解除
+      releaseWakeLock();
+
+      const finalElapsedSec = (elapsedMs / 1000).toFixed(1);
+      const diffSec = (finalElapsedSec - targetSeconds).toFixed(1);
+      const ratioPercent = targetSeconds > 0 ? ((finalElapsedSec / targetSeconds - 1) * 100).toFixed(1) : 0;
+
+      let resultText = `クリア！ かかった時間: ${finalElapsedSec}秒<br>`;
+      resultText += `規定タイム (${targetSeconds}秒) から: `;
+      if (diffSec < 0) {
+        resultText += `<span style="color: #166534; font-weight: bold;">${Math.abs(diffSec)}秒速い (${Math.abs(ratioPercent)}%)</span>`;
+      } else if (diffSec > 0) {
+        resultText += `<span style="color: #b91c1c; font-weight: bold;">${diffSec}秒遅い (+${ratioPercent}%)</span>`;
+      } else {
+        resultText += `<span style="font-weight: bold;">ぴったり (±0.0%)</span>`;
+      }
+      
+      statusText.innerHTML = resultText;
+
+      // 停止状態で最終描画（波紋エフェクトを消すため）
+      drawCanvas();
+    }
+
+    function resetTimer() {
+      resetTimerState();
+      statusText.textContent = '時間を選択してスタート';
+      drawCanvas(); // トラックを初期状態に戻して描画
+    }
+
+    function resetTimerState() {
+      cancelAnimationFrame(animationFrameId);
+      isRunning = false;
+      startTime = 0;
+      targetSeconds = 0;
+      elapsedMs = 0;
+      // スリープ抑止を解除
+      releaseWakeLock();
+    }
+
+    // 初期化実行
+    window.onload = () => {
+      resizeCanvas();
+    };
+
+    // --- Service Worker の登録と自動更新 ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((registration) => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, (err) => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+          
+        // サービスワーカーが更新（スキップ待機など）された際に自動でリロードする
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            window.location.reload();
+            refreshing = true;
+          }
+        });
+      });
+    }
+
+  </script>
+</body>
+</html>
