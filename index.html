@@ -95,7 +95,7 @@
 
     .btn-group {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       margin-bottom: 30px;
     }
@@ -126,6 +126,7 @@
     }
 
     .reset-btn {
+      grid-column: span 2;
       background: rgba(255, 150, 150, 0.2);
       border-color: rgba(255, 150, 150, 0.4);
       color: #b91c1c;
@@ -175,10 +176,12 @@
     </div>
 
     <div class="btn-group">
+      <button onclick="startTimer(10)">10秒</button>
       <button onclick="startTimer(30)">30秒</button>
       <button onclick="startTimer(45)">45秒</button>
       <button onclick="startTimer(60)">60秒</button>
       <button onclick="startTimer(90)">90秒</button>
+      <button onclick="startTimer(120)">120秒</button>
       <button class="reset-btn" onclick="resetTimer()">リセット</button>
     </div>
 
@@ -268,17 +271,21 @@
         // 原点を現在のスクロール位置に合わせて移動
         ctx.translate(centerX - currentX, centerY);
 
+        // 現在の経過秒数を考慮し、どこまでトラックを描画するか決定（最低でも目標時間+30秒、現在時間+30秒）
+        const currentSecs = elapsedMs / 1000;
+        const drawUntilSecs = Math.max(targetSeconds, currentSecs) + 30;
+
         // 横線の描画
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        ctx.lineTo(targetSeconds * PIXELS_PER_SEC, 0);
+        ctx.lineTo(drawUntilSecs * PIXELS_PER_SEC, 0);
         ctx.strokeStyle = 'rgba(0, 100, 200, 0.25)';
         ctx.lineWidth = 3;
         ctx.lineCap = 'round';
         ctx.stroke();
 
         // 15秒ごとのグリッド線の描画
-        for (let s = 0; s <= targetSeconds; s += 15) {
+        for (let s = 0; s <= drawUntilSecs; s += 15) {
           const x = s * PIXELS_PER_SEC;
           ctx.beginPath();
           ctx.moveTo(x, -20);
@@ -287,6 +294,14 @@
           ctx.lineWidth = 2;
           ctx.stroke();
         }
+
+        // 目標時間（ゴール地点）を少し目立つように描画
+        ctx.beginPath();
+        ctx.moveTo(targetSeconds * PIXELS_PER_SEC, -25);
+        ctx.lineTo(targetSeconds * PIXELS_PER_SEC, 25);
+        ctx.strokeStyle = 'rgba(37, 99, 235, 0.4)'; // 飛行機と同系の青色で少し濃く
+        ctx.lineWidth = 3;
+        ctx.stroke();
         ctx.restore();
       }
 
