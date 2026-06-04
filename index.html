@@ -312,6 +312,27 @@
       background: #1e40af;
       transform: translateY(-2px);
     }
+
+    .stats-view-btn {
+      margin-top: 15px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #475569;
+      font-size: 0.95rem;
+      padding: 10px 20px;
+      border-radius: 20px;
+      box-shadow: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .stats-view-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      color: #1e3a8a;
+      transform: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 
@@ -341,6 +362,11 @@
       <button id="breakBtn" class="secondary-btn" style="display: none;" onclick="startBreak()">休憩する</button>
       <button id="endBtn" class="danger-btn" style="display: none;" onclick="endSession()">今日の勉強タイム終了</button>
     </div>
+
+    <button class="stats-view-btn" onclick="showModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      学習記録を見る
+    </button>
   </div>
 
   <!-- Result Modal -->
@@ -487,6 +513,8 @@
       } else if (currentState === 'BREAK') {
         stats.todayBreakMs += elapsed;
       }
+      
+      stateStartTime = performance.now();
       saveStats();
     }
 
@@ -602,7 +630,7 @@
       const timeStr = mins > 0 ? `${mins}分${displaySecs}秒` : `${secs}秒`;
 
       if (currentState === 'SOLVING') {
-        stateDesc.textContent = `問題を解いています... (${(elapsedMs / 1000).toFixed(1)}秒)`;
+        stateDesc.textContent = `問題を解いています...`;
       } else if (currentState === 'EXPLANATION') {
         stateDesc.textContent = `解説を読んでいます... (${timeStr} 経過)`;
       } else if (currentState === 'BREAK') {
@@ -708,6 +736,8 @@
     }
 
     function showModal() {
+      commitCurrentStateTime();
+      
       const sMs = stats.todaySolvingMs;
       const eMs = stats.todayExplanationMs;
       const bMs = stats.todayBreakMs;
