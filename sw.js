@@ -1,6 +1,6 @@
 // ⚠️ コード（index.htmlなど）を更新した際は、ここの VERSION の文字列（時刻など）を変更してください。
 // sw.js 自体のファイル内容が変更されることで、ブラウザが新しいバージョンと認識し、自動で更新・リロードが走ります。
-const VERSION = '2026-05-30T13:05:00';
+const VERSION = '2026-06-05T11:29:00';
 const CACHE_NAME = 'timer-cache-' + VERSION;
 
 const urlsToCache = [

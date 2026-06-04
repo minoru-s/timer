@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,7 +36,7 @@
       background: var(--body-bg);
       color: var(--text-color);
       padding: 20px;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     .glass-container {
@@ -47,12 +48,11 @@
       border-right: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 10px 40px 0 var(--glass-shadow);
       border-radius: 30px;
-      padding: 50px;
+      padding: 40px;
       width: 100%;
       max-width: 600px;
       text-align: center;
-      transition: transform 0.3s ease;
-      background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.05) 100%);
+      background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.05) 100%);
     }
 
     .title {
@@ -67,25 +67,31 @@
     .status-text {
       font-size: 1.15rem;
       font-weight: 400;
-      min-height: 68px;
-      margin-bottom: 35px;
-      line-height: 1.7;
+      min-height: 48px;
+      margin-bottom: 5px;
+      line-height: 1.5;
       text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
     }
 
-    /* キャンバスを包むコンテナ */
+    .state-desc {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #475569;
+      min-height: 24px;
+      margin-bottom: 20px;
+    }
+
     .timer-visual {
       position: relative;
       width: 100%;
       height: 95px;
-      margin: 35px 0;
+      margin: 20px 0 30px;
       border-radius: 20px;
       background: var(--track-bg);
       box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
       overflow: hidden;
     }
 
-    /* キャンバス要素の設定 */
     canvas {
       display: block;
       width: 100%;
@@ -96,20 +102,20 @@
     .btn-group {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 30px;
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     button {
       background: var(--btn-bg);
       border: 1px solid var(--glass-border);
       color: var(--btn-text-color);
-      padding: 16px 10px;
-      border-radius: 15px;
+      padding: 14px 8px;
+      border-radius: 12px;
       font-size: 1.05rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       backdrop-filter: blur(10px);
       text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
@@ -117,8 +123,8 @@
 
     button:hover {
       background: var(--btn-hover-bg);
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
 
     button:active {
@@ -131,45 +137,190 @@
       border-color: rgba(255, 150, 150, 0.4);
       color: #b91c1c;
     }
+
     .reset-btn:hover {
       background: rgba(255, 150, 150, 0.4);
     }
 
-    .done-btn {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.5);
-      color: #1e3a8a;
-      font-weight: 700;
-      font-size: 1.25rem;
-      padding: 20px;
-      border-radius: 20px;
-      letter-spacing: 1px;
-      text-shadow: 0 1px 3px rgba(255, 255, 255, 0.7);
+    .action-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .done-btn:hover {
-      background: rgba(255, 255, 255, 0.7);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    .primary-btn {
+      background: rgba(255, 255, 255, 0.6);
+      color: #1e3a8a;
+      font-size: 1.25rem;
+      padding: 18px;
+      border-radius: 16px;
+    }
+
+    .primary-btn:hover {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .secondary-btn {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: rgba(34, 197, 94, 0.3);
+      color: #166534;
+      padding: 14px;
+    }
+
+    .secondary-btn:hover {
+      background: rgba(34, 197, 94, 0.35);
+    }
+
+    .danger-btn {
+      background: rgba(15, 23, 42, 0.1);
+      border-color: rgba(15, 23, 42, 0.2);
+      color: #1e293b;
+      padding: 14px;
+    }
+
+    .danger-btn:hover {
+      background: rgba(15, 23, 42, 0.15);
     }
 
     @media (max-width: 600px) {
       .glass-container {
-        padding: 40px;
+        padding: 30px;
       }
+
       .btn-group {
         grid-template-columns: repeat(3, 1fr);
       }
+
       .reset-btn {
         grid-column: span 3;
       }
     }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      width: 90%;
+      max-width: 450px;
+      padding: 35px;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-content h2 {
+      margin-bottom: 25px;
+      color: #1e3a8a;
+      font-size: 1.6rem;
+    }
+
+    .pie-chart {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      margin: 0 auto 25px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: background 0.5s ease;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      text-align: left;
+      margin-bottom: 25px;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.6);
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    }
+
+    .stat-box.full-width {
+      grid-column: span 2;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #1e293b;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+
+    .close-btn {
+      width: 100%;
+      background: #1e3a8a;
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 1.1rem;
+      text-shadow: none;
+    }
+
+    .close-btn:hover {
+      background: #1e40af;
+      transform: translateY(-2px);
+    }
   </style>
 </head>
+
 <body>
 
   <div class="glass-container">
     <h1 class="title">Focus Timer</h1>
     <div class="status-text" id="statusText">時間を選択してスタート</div>
+    <div class="state-desc" id="stateDesc"></div>
 
     <div class="timer-visual" id="canvasContainer">
       <canvas id="timerCanvas"></canvas>
@@ -182,10 +333,53 @@
       <button onclick="startTimer(60)">60秒</button>
       <button onclick="startTimer(90)">90秒</button>
       <button onclick="startTimer(120)">120秒</button>
-      <button class="reset-btn" onclick="resetTimer()">リセット</button>
+      <button class="reset-btn" onclick="resetTimer()">リセット(記録なし)</button>
     </div>
 
-    <button class="done-btn" onclick="stopTimer()">完了 / タイム記録</button>
+    <div class="action-btn-group" id="actionBtnGroup">
+      <button id="doneBtn" class="primary-btn" style="display: none;" onclick="finishSolving()">完了 / タイム記録</button>
+      <button id="breakBtn" class="secondary-btn" style="display: none;" onclick="startBreak()">休憩する</button>
+      <button id="endBtn" class="danger-btn" style="display: none;" onclick="endSession()">今日の勉強タイム終了</button>
+    </div>
+  </div>
+
+  <!-- Result Modal -->
+  <div id="resultModal" class="modal-overlay">
+    <div class="modal-content glass-container">
+      <h2>お疲れ様でした！</h2>
+      <div class="pie-chart" id="pieChart"></div>
+
+      <div class="stats-grid">
+        <div class="stat-box full-width">
+          <div class="stat-label">今日の勉強時間 (解答＋解説)</div>
+          <div class="stat-value" id="modalTotalStudy" style="font-size: 1.6rem; color: #1e3a8a;">0秒</div>
+        </div>
+        <div class="stat-box">
+          <div class="legend">
+            <div class="legend-color" style="background:#3b82f6;"></div>解答
+          </div>
+          <div class="stat-value" id="modalSolving">0秒</div>
+        </div>
+        <div class="stat-box">
+          <div class="legend">
+            <div class="legend-color" style="background:#22c55e;"></div>解説
+          </div>
+          <div class="stat-value" id="modalExplanation">0秒</div>
+        </div>
+        <div class="stat-box">
+          <div class="legend">
+            <div class="legend-color" style="background:#f97316;"></div>休憩
+          </div>
+          <div class="stat-value" id="modalBreak">0秒</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">累計学習時間</div>
+          <div class="stat-value" id="modalCumulative">0秒</div>
+        </div>
+      </div>
+
+      <button class="close-btn" onclick="closeModal()">閉じる</button>
+    </div>
   </div>
 
   <script>
@@ -195,28 +389,25 @@
     const container = document.getElementById('canvasContainer');
     let canvasWidth, canvasHeight;
 
-    // Retinaディスプレイ等でぼやけないようDPIスケーリングを行う関数
     function resizeCanvas() {
       const rect = container.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
-      
+
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       canvasWidth = rect.width;
       canvasHeight = rect.height;
-      
+
       ctx.scale(dpr, dpr);
       canvas.style.width = `${rect.width}px`;
       canvas.style.height = `${rect.height}px`;
-      
-      drawCanvas(); // リサイズ時に再描画
-    }
 
+      drawCanvas();
+    }
     window.addEventListener('resize', resizeCanvas);
 
-    // --- スリープ抑止 (Wake Lock API) ---
+    // --- Wake Lock API ---
     let wakeLock = null;
-
     async function requestWakeLock() {
       if ('wakeLock' in navigator) {
         try {
@@ -226,56 +417,132 @@
         }
       }
     }
-
     function releaseWakeLock() {
       if (wakeLock !== null) {
-        wakeLock.release().then(() => {
-          wakeLock = null;
-        });
+        wakeLock.release().then(() => { wakeLock = null; });
       }
     }
-
-    // 別タブを開いて戻ってきた時など、可視状態が変わったときの処理
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && isRunning) {
-        // 計測中で画面が再び表示されたら再ロック
+      if (document.visibilityState === 'visible' && currentState !== 'IDLE') {
         requestWakeLock();
       }
     });
 
-    // --- タイマーのロジック用変数 ---
+    // --- State Machine & Persistence ---
+    let currentState = 'IDLE'; // 'IDLE', 'SOLVING', 'EXPLANATION', 'BREAK'
+    let stateStartTime = 0;
+
+    let stats = {
+      lastDate: '',
+      todaySolvingMs: 0,
+      todayExplanationMs: 0,
+      todayBreakMs: 0,
+      cumulativeStudyMs: 0
+    };
+
+    function loadStats() {
+      const saved = localStorage.getItem('studyTimerStats');
+      if (saved) {
+        try {
+          stats = { ...stats, ...JSON.parse(saved) };
+        } catch (e) { }
+      }
+
+      // 日替わり判定
+      const today = new Date().toLocaleDateString();
+      if (stats.lastDate !== today) {
+        stats.lastDate = today;
+        stats.todaySolvingMs = 0;
+        stats.todayExplanationMs = 0;
+        stats.todayBreakMs = 0;
+        saveStats();
+      }
+      setUIForState('IDLE');
+    }
+
+    function saveStats() {
+      localStorage.setItem('studyTimerStats', JSON.stringify(stats));
+    }
+
+    function commitCurrentStateTime() {
+      if (currentState === 'IDLE' || stateStartTime === 0) return;
+
+      // 日替わりチェック (深夜に跨いだ場合も、とりあえずコミット時に今日に加算される。細かい要件は午前0時リセット)
+      const today = new Date().toLocaleDateString();
+      if (stats.lastDate !== today) {
+        stats.lastDate = today;
+        stats.todaySolvingMs = 0;
+        stats.todayExplanationMs = 0;
+        stats.todayBreakMs = 0;
+      }
+
+      const elapsed = performance.now() - stateStartTime;
+
+      if (currentState === 'SOLVING') {
+        stats.todaySolvingMs += elapsed;
+        stats.cumulativeStudyMs += elapsed;
+      } else if (currentState === 'EXPLANATION') {
+        stats.todayExplanationMs += elapsed;
+        stats.cumulativeStudyMs += elapsed;
+      } else if (currentState === 'BREAK') {
+        stats.todayBreakMs += elapsed;
+      }
+      saveStats();
+    }
+
+    // ページを閉じる際にも時間を記録
+    window.addEventListener('beforeunload', () => {
+      commitCurrentStateTime();
+    });
+
+    // --- Timer Logic ---
     const PIXELS_PER_SEC = 15;
     let animationFrameId;
-    let startTime = 0;
     let targetSeconds = 0;
-    let isRunning = false;
-    let elapsedMs = 0; // 現在の経過時間
+    let elapsedMs = 0;
 
     const statusText = document.getElementById('statusText');
-    
-    // 飛行機のSVGパスデータ（Path2Dオブジェクト）
+    const stateDesc = document.getElementById('stateDesc');
     const planePath = new Path2D('M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z');
 
-    // --- 描画関数 ---
-    function drawCanvas() {
-      // キャンバスをクリア
-      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    function setUIForState(state) {
+      const doneBtn = document.getElementById('doneBtn');
+      const breakBtn = document.getElementById('breakBtn');
+      const endBtn = document.getElementById('endBtn');
 
+      doneBtn.style.display = (state === 'SOLVING') ? 'block' : 'none';
+      breakBtn.style.display = (state === 'EXPLANATION') ? 'block' : 'none';
+
+      // End button is shown if not IDLE, OR if we have some study time today.
+      const hasStudiedToday = (stats.todaySolvingMs > 0 || stats.todayExplanationMs > 0);
+      endBtn.style.display = (state !== 'IDLE' || hasStudiedToday) ? 'block' : 'none';
+    }
+
+    function drawPulse(x, y, colorPrefix, duration, maxRadius) {
+      const pulseTime = (performance.now() - stateStartTime) % duration;
+      const pulseProgress = pulseTime / duration;
+      const currentRadius = maxRadius * pulseProgress;
+      const opacity = 1 - Math.pow(pulseProgress, 1.5);
+      ctx.beginPath();
+      ctx.arc(x, y, currentRadius, 0, Math.PI * 2);
+      ctx.fillStyle = `${colorPrefix} ${opacity * 0.5})`;
+      ctx.fill();
+    }
+
+    function drawCanvas() {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
       const centerX = canvasWidth / 2;
       const centerY = canvasHeight / 2;
-      const currentX = (elapsedMs / 1000) * PIXELS_PER_SEC;
 
-      // 1. トラック（線とグリッド）の描画
-      if (targetSeconds > 0) {
+      if (currentState === 'SOLVING' && targetSeconds > 0) {
+        const currentX = (elapsedMs / 1000) * PIXELS_PER_SEC;
+
+        // Track
         ctx.save();
-        // 原点を現在のスクロール位置に合わせて移動
         ctx.translate(centerX - currentX, centerY);
-
-        // 現在の経過秒数を考慮し、どこまでトラックを描画するか決定（最低でも目標時間+30秒、現在時間+30秒）
         const currentSecs = elapsedMs / 1000;
         const drawUntilSecs = Math.max(targetSeconds, currentSecs) + 30;
 
-        // 横線の描画
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(drawUntilSecs * PIXELS_PER_SEC, 0);
@@ -284,7 +551,6 @@
         ctx.lineCap = 'round';
         ctx.stroke();
 
-        // 15秒ごとのグリッド線の描画
         for (let s = 0; s <= drawUntilSecs; s += 15) {
           const x = s * PIXELS_PER_SEC;
           ctx.beginPath();
@@ -295,148 +561,203 @@
           ctx.stroke();
         }
 
-        // 目標時間（ゴール地点）を少し目立つように描画
         ctx.beginPath();
         ctx.moveTo(targetSeconds * PIXELS_PER_SEC, -25);
         ctx.lineTo(targetSeconds * PIXELS_PER_SEC, 25);
-        ctx.strokeStyle = 'rgba(37, 99, 235, 0.4)'; // 飛行機と同系の青色で少し濃く
+        ctx.strokeStyle = 'rgba(37, 99, 235, 0.4)';
         ctx.lineWidth = 3;
         ctx.stroke();
         ctx.restore();
+
+        // Pulse
+        drawPulse(centerX, centerY, 'rgba(37, 99, 235,', 2500, 35);
+
+        // Plane
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(Math.PI / 2);
+        ctx.shadowColor = 'rgba(37, 99, 235, 0.6)';
+        ctx.shadowBlur = 15;
+        const scale = 1.3;
+        ctx.scale(scale, scale);
+        ctx.translate(-12, -12);
+        ctx.fillStyle = '#2563eb';
+        ctx.fill(planePath);
+        ctx.restore();
+
+      } else if (currentState === 'EXPLANATION') {
+        drawPulse(centerX, centerY, 'rgba(34, 197, 94,', 3000, 45); // Green pulse
+      } else if (currentState === 'BREAK') {
+        drawPulse(centerX, centerY, 'rgba(249, 115, 22,', 4000, 50); // Orange pulse
       }
-
-      // 2. 波紋エフェクトの描画（計測中のみ）
-      if (isRunning) {
-        // 2500ms周期の波紋
-        const pulseTime = (performance.now() - startTime) % 2500;
-        const pulseProgress = pulseTime / 2500;
-        const maxRadius = 35;
-        const currentRadius = maxRadius * pulseProgress;
-        const opacity = 1 - Math.pow(pulseProgress, 1.5); // だんだん薄くなる
-
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, currentRadius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(37, 99, 235, ${opacity * 0.5})`;
-        ctx.fill();
-      }
-
-      // 3. 飛行機の描画
-      ctx.save();
-      ctx.translate(centerX, centerY);
-      ctx.rotate(Math.PI / 2); // 右向きに回転
-
-      // 光彩エフェクト
-      ctx.shadowColor = 'rgba(37, 99, 235, 0.6)';
-      ctx.shadowBlur = 15;
-      
-      // SVGパスを中心(12, 12)に合わせてスケーリング
-      const scale = 1.3; // 32px相当にするための倍率
-      ctx.scale(scale, scale);
-      ctx.translate(-12, -12); // 24x24のパスを中心へ
-      
-      ctx.fillStyle = '#2563eb';
-      ctx.fill(planePath);
-      ctx.restore();
-    }
-
-    // --- タイマー操作関数 ---
-    function startTimer(seconds) {
-      resetTimerState();
-      
-      targetSeconds = seconds;
-      isRunning = true;
-      startTime = performance.now();
-      elapsedMs = 0;
-
-      statusText.textContent = '測定中...';
-
-      // スリープを抑止する
-      requestWakeLock();
-
-      // 描画ループ開始
-      animationFrameId = requestAnimationFrame(updateTimer);
     }
 
     function updateTimer(currentTime) {
-      if (!isRunning) return;
+      if (currentState === 'IDLE') return;
 
-      elapsedMs = currentTime - startTime;
-      drawCanvas(); // 毎フレームキャンバスを描画し直す
+      elapsedMs = currentTime - stateStartTime;
+      const secs = Math.floor(elapsedMs / 1000);
+      const mins = Math.floor(secs / 60);
+      const displaySecs = secs % 60;
+      const timeStr = mins > 0 ? `${mins}分${displaySecs}秒` : `${secs}秒`;
 
+      if (currentState === 'SOLVING') {
+        stateDesc.textContent = `問題を解いています... (${(elapsedMs / 1000).toFixed(1)}秒)`;
+      } else if (currentState === 'EXPLANATION') {
+        stateDesc.textContent = `解説を読んでいます... (${timeStr} 経過)`;
+      } else if (currentState === 'BREAK') {
+        stateDesc.textContent = `休憩中... (${timeStr} 経過)`;
+      }
+
+      drawCanvas();
       animationFrameId = requestAnimationFrame(updateTimer);
     }
 
-    function stopTimer() {
-      if (!isRunning) return;
-      
-      isRunning = false;
-      cancelAnimationFrame(animationFrameId);
-      
-      // スリープ抑止を解除
-      releaseWakeLock();
+    // --- User Actions ---
+    function startTimer(seconds) {
+      commitCurrentStateTime(); // Save previous state if any
+
+      currentState = 'SOLVING';
+      stateStartTime = performance.now();
+      targetSeconds = seconds;
+      elapsedMs = 0;
+
+      setUIForState(currentState);
+      statusText.textContent = `目標: ${seconds}秒`;
+      stateDesc.textContent = '';
+
+      requestWakeLock();
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(updateTimer);
+    }
+
+    function finishSolving() {
+      if (currentState !== 'SOLVING') return;
+      commitCurrentStateTime();
 
       const finalElapsedSec = (elapsedMs / 1000).toFixed(1);
       const diffSec = (finalElapsedSec - targetSeconds).toFixed(1);
       const ratioPercent = targetSeconds > 0 ? ((finalElapsedSec / targetSeconds - 1) * 100).toFixed(1) : 0;
 
-      let resultText = `クリア！ かかった時間: ${finalElapsedSec}秒<br>`;
-      resultText += `規定タイム (${targetSeconds}秒) から: `;
+      let resultText = `クリア！ 解答時間: ${finalElapsedSec}秒<br>`;
+      resultText += `<span style="font-size:0.95rem; margin-top: 4px; display: block;">規定タイム (${targetSeconds}秒) から: `;
       if (diffSec < 0) {
-        resultText += `<span style="color: #166534; font-weight: bold;">${Math.abs(diffSec)}秒速い (${Math.abs(ratioPercent)}%)</span>`;
+        resultText += `<span style="color: #166534; font-weight: bold;">${Math.abs(diffSec)}秒速い</span>`;
       } else if (diffSec > 0) {
-        resultText += `<span style="color: #b91c1c; font-weight: bold;">${diffSec}秒遅い (+${ratioPercent}%)</span>`;
+        resultText += `<span style="color: #b91c1c; font-weight: bold;">${diffSec}秒遅い</span>`;
       } else {
-        resultText += `<span style="font-weight: bold;">ぴったり (±0.0%)</span>`;
+        resultText += `<span style="font-weight: bold;">ぴったり</span>`;
       }
-      
+      resultText += `</span>`;
+
       statusText.innerHTML = resultText;
 
-      // 停止状態で最終描画（波紋エフェクトを消すため）
-      drawCanvas();
+      currentState = 'EXPLANATION';
+      stateStartTime = performance.now();
+      elapsedMs = 0;
+      setUIForState(currentState);
+    }
+
+    function startBreak() {
+      if (currentState !== 'EXPLANATION' && currentState !== 'SOLVING') return;
+      commitCurrentStateTime();
+
+      statusText.textContent = 'リフレッシュしましょう！';
+
+      currentState = 'BREAK';
+      stateStartTime = performance.now();
+      elapsedMs = 0;
+      setUIForState(currentState);
     }
 
     function resetTimer() {
-      resetTimerState();
-      statusText.textContent = '時間を選択してスタート';
-      drawCanvas(); // トラックを初期状態に戻して描画
-    }
-
-    function resetTimerState() {
-      cancelAnimationFrame(animationFrameId);
-      isRunning = false;
-      startTime = 0;
-      targetSeconds = 0;
-      elapsedMs = 0;
-      // スリープ抑止を解除
+      // Don't commit time (abort)
+      currentState = 'IDLE';
+      stateStartTime = 0;
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
       releaseWakeLock();
+      setUIForState('IDLE');
+      statusText.textContent = '時間を選択してスタート';
+      stateDesc.textContent = '';
+      drawCanvas();
     }
 
-    // 初期化実行
+    function endSession() {
+      commitCurrentStateTime();
+      currentState = 'IDLE';
+      stateStartTime = 0;
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      releaseWakeLock();
+      setUIForState('IDLE');
+      statusText.textContent = '時間を選択してスタート';
+      stateDesc.textContent = '';
+      drawCanvas();
+
+      showModal();
+    }
+
+    // --- Modal Logic ---
+    function formatMs(ms) {
+      const totalSecs = Math.floor(ms / 1000);
+      const h = Math.floor(totalSecs / 3600);
+      const m = Math.floor((totalSecs % 3600) / 60);
+      const s = totalSecs % 60;
+      if (h > 0) return `${h}時間${m}分${s}秒`;
+      if (m > 0) return `${m}分${s}秒`;
+      return `${s}秒`;
+    }
+
+    function showModal() {
+      const sMs = stats.todaySolvingMs;
+      const eMs = stats.todayExplanationMs;
+      const bMs = stats.todayBreakMs;
+      const totalStudyMs = sMs + eMs;
+      const totalAllMs = totalStudyMs + bMs;
+
+      document.getElementById('modalTotalStudy').textContent = formatMs(totalStudyMs);
+      document.getElementById('modalCumulative').textContent = formatMs(stats.cumulativeStudyMs);
+
+      document.getElementById('modalSolving').textContent = formatMs(sMs);
+      document.getElementById('modalExplanation').textContent = formatMs(eMs);
+      document.getElementById('modalBreak').textContent = formatMs(bMs);
+
+      const pieChart = document.getElementById('pieChart');
+      if (totalAllMs === 0) {
+        pieChart.style.background = '#e2e8f0';
+      } else {
+        const sPct = (sMs / totalAllMs) * 100;
+        const ePct = (eMs / totalAllMs) * 100;
+        const bPct = (bMs / totalAllMs) * 100;
+
+        pieChart.style.background = `conic-gradient(
+          #3b82f6 0% ${sPct}%,
+          #22c55e ${sPct}% ${sPct + ePct}%,
+          #f97316 ${sPct + ePct}% 100%
+        )`;
+      }
+
+      const modal = document.getElementById('resultModal');
+      modal.classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('resultModal').classList.remove('show');
+    }
+
+    // --- Init ---
     window.onload = () => {
+      loadStats();
       resizeCanvas();
     };
 
-    // --- Service Worker の登録と自動更新 ---
+    // --- Service Worker ---
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((registration) => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          }, (err) => {
-            console.log('ServiceWorker registration failed: ', err);
-          });
-          
-        // サービスワーカーが更新（スキップ待機など）された際に自動でリロードする
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (!refreshing) {
-            window.location.reload();
-            refreshing = true;
-          }
-        });
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
       });
     }
 
   </script>
 </body>
+
 </html>
